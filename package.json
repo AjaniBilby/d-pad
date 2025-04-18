@@ -1,0 +1,30 @@
+{
+	"name": "d-pad",
+	"version": "1.0.0",
+	"description": "easy keyboard navigation without having to change your html",
+	"keywords": [
+		"dpad",
+		"keyboard",
+		"navigation",
+		"html",
+		"client"
+	],
+	"homepage": "https://github.com/AjaniBilby/d-pad#readme",
+	"bugs": {
+		"url": "https://github.com/AjaniBilby/d-pad/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/AjaniBilby/d-pad.git"
+	},
+	"license": "MIT",
+	"author": "Ajani Bilby",
+	"type": "commonjs",
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "tsc & terser dist/index.js --compress --mangle --output dist/index.min.js"
+	},
+	"devDependencies": {
+		"terser": "^5.39.0"
+	}
+}
