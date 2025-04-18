@@ -1,6 +1,6 @@
 # D-Pad
 
-![free navigation](./public/free-navigation.gif)
+![free navigation](.images/free-navigation.gif)
 
 - Adds keyboard navigation to any page **without changing the HTML**
 - **Framework friendly**: Doesn't add or remove any html: elements, classes or attributes - meaning it won't make any conflicts with your existing framework's client state
@@ -51,13 +51,13 @@ We allow grouping navigable elements together using the CSS class `dp-group`.
 This can allow the user to skip over large sections without navigating through each one individually.
 When a `dp-group` is focused, you can enter the group using <kbd>Space</kbd>.
 
-![group navigation](./public/group-navigation.gif)
+![group navigation](.images/group-navigation.gif)
 
 ### Auto Flow (`dp-flow-auto`)
 
 When `flow-auto` is enabled, when an `<input>` has reached it's maximum input length, when using <kbd>Backspace</kbd> on a `<input>`/`<textarea>` making it blank, `d-pad` will attempt to auto-navigate to the next/previous input.
 
-![auto flow](./public/auto-flow.gif)
+![auto flow](.images/auto-flow.gif)
 
 
 ## Features
