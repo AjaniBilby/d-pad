@@ -8,10 +8,10 @@ var dpad = function(){
 			this.y = y;
 		}
 
-		length2 () {
+		length2() {
 			return this.x*this.x + this.y*this.y;
 		}
-		length () {
+		length() {
 			return Math.sqrt(this.length2());
 		}
 
@@ -50,7 +50,7 @@ var dpad = function(){
 			return this;
 		}
 
-		to (other: Vec2): Vec2 {
+		to(other: Vec2): Vec2 {
 			this.x -= other.x;
 			this.y -= other.y;
 			return this;
@@ -62,34 +62,24 @@ var dpad = function(){
 			return true;
 		}
 
-		dot (other: Vec2) {
+		dot(other: Vec2) {
 			return this.x * other.x + this.y * other.y;
 		}
 
-		copy () {
-			return new Vec2(this.x, this.y);
-		}
-
-		toString() {
-			return `vec2{${this.x}, ${this.y}}`;
-		}
-
-		static blank = new Vec2(0,0);
+		copy() { return new Vec2(this.x, this.y); }
+		toString() { return `vec2{${this.x}, ${this.y}}`; }
 	}
 
 	class Rect {
 		tl: Vec2; // top-left
 		br: Vec2; // bottom-right
 
-		constructor(a: Vec2, b: Vec2) {
-			this.tl = new Vec2(
-				Math.min(a.x, b.x),
-				Math.min(a.y, b.y),
-			);
-			this.br = new Vec2(
-				Math.max(a.x, b.x),
-				Math.max(a.y, b.y),
-			);
+		constructor(element: Element) {
+			if (!element.isConnected) console.warn("D-Pad GetBounds: Element might not be rendered or connected to the DOM.", element);
+
+			const rect = element.getBoundingClientRect();
+			this.tl = new Vec2(rect.left, rect.top);
+			this.br = new Vec2(rect.right, rect.bottom);
 		}
 
 		overlaps(other: Rect) {
@@ -139,52 +129,15 @@ var dpad = function(){
 		toString() {
 			return `rect{ ${this.tl}, ${this.br} }`;
 		}
-
-		static blank = new Rect(Vec2.blank, Vec2.blank);
 	}
 
-	function GetBounds(element: Element): Rect {
-		if (!element) return Rect.blank;
 
-		if (!element.isConnected) console.warn("GetBounds: Element might not be rendered or connected to the DOM.", element);
 
-		const rect = element.getBoundingClientRect();
-
-		const tl = new Vec2(rect.left, rect.top);
-		const br = new Vec2(rect.right, rect.bottom);
-
-		return new Rect(tl, br);
-	}
 
 
 	let groupFocus = null as null | { element: HTMLElement, from: Rect, dir: Vec2 };
-
-	function Move(focus: HTMLElement, dir: Vec2): boolean {
-		const scope = GetGroup(focus);
-		const best = NearestElement(focus, dir, GroupElements(scope, focus));
-		const from = GetBounds(focus);
-
-		if (best) {
-			if (best.classList.contains("dp-group")) groupFocus = { element: best, dir, from };
-			else groupFocus = null;
-
-			best.focus();
-			return true;
-		}
-
-		if (scope != document.body) {
-			groupFocus = { element: scope, dir: dir.invert(), from };
-			scope.focus();
-			return true;
-		}
-
-		if (groupFocus) groupFocus.dir = dir;
-
-		return false;
-	}
-
 	function NearestElement(target: HTMLElement, dir: Vec2, group: ReturnType<typeof GroupElements>): HTMLElement | null {
-		const cursor = GetBounds(target);
+		const cursor = new Rect(target);
 		const position = cursor.center();
 
 		const best = {
@@ -195,7 +148,7 @@ var dpad = function(){
 		};
 
 		for (const element of group) {
-			const bounds = GetBounds(element);
+			const bounds = new Rect(element);
 			if (bounds.overlaps(cursor)) continue;
 
 			const d = cursor.vector(bounds);
@@ -226,30 +179,60 @@ var dpad = function(){
 		return best?.element;
 	}
 
+	function Move(focus: HTMLElement, dir: Vec2, simulated = false): boolean {
+		const scope = GetGroup(focus);
+		const best = NearestElement(focus, dir, GroupElements(scope, focus));
+		const from = new Rect(focus);
 
+		if (best) {
+			if (best.classList.contains("dp-group")) groupFocus = { element: best, dir, from };
+			else groupFocus = null;
 
-	function EnterGroup(focus: NonNullable<typeof groupFocus>) {
-		const best = {
-			distance:  Infinity,
-			element:   null as HTMLElement | null,
-		};
-
-		for (const element of GroupElements(focus.element)) {
-			const bounds = GetBounds(element);
-			const offset = bounds.vector(focus.from);
-			const distance = offset.length2();
-
-			if (distance > best.distance) continue;
-
-			best.element   = element;
-			best.distance  = distance;
+			best.focus();
+			return true;
 		}
 
-		if (!best.element) return false;
+		if (simulated) return false;
 
-		best.element.focus();
-		return true;
+		if (scope != document.body) {
+			groupFocus = { element: scope, dir: dir.invert(), from };
+			scope.focus();
+			return true;
+		}
+
+		if (groupFocus) groupFocus.dir = dir;
+
+		return false;
 	}
+
+	function AutoFlow(focus: HTMLElement, moves: Vec2[]) {
+		if (!CheckRule(focus, "dp-flow-auto", "dp-flow-strict")) return false;
+		for (const move of moves) if (Move(focus, move.copy(), true)) return true; // try move
+		return false;
+	}
+
+	function Next(focus: HTMLInputElement | HTMLTextAreaElement) {
+		setTimeout(() => { // wait till after keypress applied
+			if (!focus.maxLength || focus.maxLength === -1) return false;
+			if (focus.value.length < focus.maxLength) return false;
+			AutoFlow(focus, autoFlow.next);
+		}, 0);
+
+		return false; // don't consume input
+	}
+
+	function Back(focus: HTMLInputElement | HTMLTextAreaElement) {
+		setTimeout(() => { // wait till after keypress applied
+			if (focus.value.length !== 0) return;
+			AutoFlow(focus, autoFlow.back);
+		}, 0);
+
+		return false; // don't consume input
+	}
+
+
+
+
 
 	function GetGroup(e: HTMLElement) {
 		const r = e.parentElement?.closest(".dp-group");
@@ -277,6 +260,32 @@ var dpad = function(){
 			yield element;
 		}
 	}
+
+	function EnterGroup(focus: NonNullable<typeof groupFocus>) {
+		const best = {
+			distance:  Infinity,
+			element:   null as HTMLElement | null,
+		};
+
+		for (const element of GroupElements(focus.element)) {
+			const bounds = new Rect(element);
+			const offset = bounds.vector(focus.from);
+			const distance = offset.length2();
+
+			if (distance > best.distance) continue;
+
+			best.element   = element;
+			best.distance  = distance;
+		}
+
+		if (!best.element) return false;
+
+		best.element.focus();
+		return true;
+	}
+
+
+
 
 
 	function CheckRule(element: HTMLElement, on: string, off: string) {
@@ -325,10 +334,10 @@ var dpad = function(){
 				}
 				case "ArrowUp":   return Move(focus, DIRECTION.up.copy());
 				case "ArrowDown": return Move(focus, DIRECTION.down.copy());
-				case "Backspace": return Backspace(focus);
+				case "Backspace": return Back(focus);
 				default: {
 					const isPotentiallyAddingChar = ev.key.length === 1 && !ev.ctrlKey && !ev.metaKey && !ev.altKey;
-					if (isPotentiallyAddingChar) return Forward(focus);
+					if (isPotentiallyAddingChar) return Next(focus);
 				}
 			}
 
@@ -376,7 +385,7 @@ var dpad = function(){
 
 					return Move(focus, DIRECTION.down.copy());
 				}
-				case "Backspace": return Backspace(focus);
+				case "Backspace": return Back(focus);
 			}
 
 			return false;
@@ -387,26 +396,6 @@ var dpad = function(){
 
 		return Move(focus, dir);
 	}
-
-	function Forward(focus: HTMLInputElement | HTMLTextAreaElement) {
-		setTimeout(() => {
-			if (!focus.maxLength || focus.maxLength === -1) return false;
-			if (focus.value.length < focus.maxLength) return false;
-			AutoFlow(focus, true);
-		}, 0);
-
-		return false; // don't consume input
-	}
-
-	function Backspace(focus: HTMLInputElement | HTMLTextAreaElement) {
-		setTimeout(() => {
-			if (focus.value.length !== 0) return;
-			AutoFlow(focus, false);
-		}, 0);
-
-		return false; // don't consume input
-	}
-
 
 	function GetTextAreaPosition(input: HTMLTextAreaElement) {
 		let col = 0;
@@ -460,15 +449,6 @@ var dpad = function(){
 	const autoFlow = {
 		next: [ DIRECTION.right, DIRECTION.down ],
 		back: [ DIRECTION.left,  DIRECTION.up ],
-	}
-
-	function AutoFlow(focus: HTMLElement, forward: boolean) {
-		if (!CheckRule(focus, "dp-flow-auto", "dp-flow-strict")) return false;
-
-		const moves = forward ? autoFlow.next : autoFlow.back;
-		for (const move of moves) if (Move(focus, move.copy())) return true; // try move
-
-		return false;
 	}
 
 	return {
