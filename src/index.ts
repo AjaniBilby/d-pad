@@ -452,7 +452,7 @@ var dpad = function(){
 	}
 
 	return {
-		directions: DIRECTION,
+		direction: DIRECTION,
 		autoFlow,
 	}
 }()
