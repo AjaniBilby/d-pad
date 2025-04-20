@@ -101,4 +101,4 @@ dpad.autoFlow = {
 
 ## Examples
 
-See [https://dpad.ajanibilby.com/examples](https://dpad.ajanibilby.com/examples)
+See [https://d-pad.ajanibilby.com/example](https://d-pad.ajanibilby.com/example)
