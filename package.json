@@ -1,6 +1,6 @@
 {
 	"name": "d-pad",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "easy keyboard navigation without having to change your html",
 	"keywords": [
 		"dpad",
@@ -21,9 +21,6 @@
 	"author": "Ajani Bilby",
 	"type": "commonjs",
 	"main": "dist/index.min.js",
-	"scripts": {
-		"build": "tsc & terser dist/index.js --compress --mangle --output dist/index.min.js"
-	},
 	"devDependencies": {
 		"terser": "^5.39.0"
 	}
