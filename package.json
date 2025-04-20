@@ -22,6 +22,7 @@
 	"type": "commonjs",
 	"main": "dist/index.min.js",
 	"devDependencies": {
-		"terser": "^5.39.0"
+		"terser": "^5.39.0",
+		"typescript": "^5.8.3"
 	}
 }
