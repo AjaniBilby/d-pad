@@ -18,9 +18,9 @@ jobs:
           node-version: '22.x'
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
-      - run: tsc
+      - run: npx tsc
       - run: ls dist
-      - run: terser dist/index.js --compress --mangle --output dist/index.min.js
+      - run: npx terser dist/index.js --compress --mangle --output dist/index.min.js
       # - run: npm publish --provenance --access public
         # env:
         #   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
