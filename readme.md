@@ -1,5 +1,3 @@
-# D-Pad
-
 ![free navigation](.images/free-navigation.gif)
 
 - Adds keyboard navigation to any page **without changing the HTML**
@@ -13,7 +11,7 @@
 Import the library in your client side.
 
 ```html
-<script src="https://unpkg.com/d-pad@0.0.1"></script>
+<script src="https://unpkg.com/d-pad@1.0.2"></script>
 ```
 
 Enable the library at the level of your DOM you desire. i.e.:
@@ -31,11 +29,9 @@ a:focus-visible, select:focus-visible, *[tabindex]:focus-visible {
 	outline: 1px dashed blue !important;
 	box-shadow: inset 0 0 5px 0 blue;
 }
-```
 
-Alternatively you can import the library directly in your client side JS code if you are using a framework that allows that.
-```js
-import "d-pad";
+/* Alternatively you can import directly from unpkg */
+@import url("https://unpkg.com/d-pad@1.0.2/styles.css");
 ```
 
 ## Navigation
@@ -86,6 +82,11 @@ If you have a custom element such as a searchable drop down in create, make sure
 
 Alternatively add the class `dp-disable` to the root of your element to disable all navigation from that element.
 
+### Non-Input Element Focusing
+
+By default when you attempt focus an element such as a `<div>`, the browser does nothing.
+Non-input elements must have a `tabindex` property before they can become focusable, so if you want focus navigation to a `<div>` we recommend adding the attribute `tabindex="0"`.
+
 
 ## Customization
 
@@ -96,3 +97,8 @@ dpad.autoFlow = {
   back: [ dpad.direction.left,  dpad.direction.up ]
 }
 ```
+
+
+## Examples
+
+See [https://dpad.ajanibilby.com/examples](https://dpad.ajanibilby.com/examples)
