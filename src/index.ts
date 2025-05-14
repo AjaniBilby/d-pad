@@ -244,18 +244,19 @@ var dpad = function(){
 		const elements = scope.querySelectorAll('input, textarea, select, button, a, *[tabindex], audio, video, summary');
 
 		for (const element of elements) {
-			if (element === scope)  continue;
+			if (element === scope ) continue;
 			if (element === ignore) continue;
 			if (!(element instanceof HTMLElement)) continue;
-			if (element.classList.contains("dp-ignore")) continue;
+			if (element.classList.contains("dp-ignore" )) continue;
 			if (element.classList.contains("dp-disable")) continue;
 			if (GetGroup(element) != scope) continue;
 
 			if (element.hasAttribute("disabled")) continue;
 
 			const style = window.getComputedStyle(element);
-			if (style.display === "none") continue;
-			if (style.visibility === "hidden") continue;
+			if (style.display    === "none"    ) continue;
+			if (style.visibility === "hidden"  ) continue; // hidden
+			if (style.display    === "contents") continue; // not focusable
 
 			yield element;
 		}

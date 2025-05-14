@@ -11,7 +11,7 @@
 Import the library in your client side.
 
 ```html
-<script src="https://unpkg.com/d-pad@1.0.6"></script>
+<script src="https://unpkg.com/d-pad@1.0.7"></script>
 ```
 
 Enable the library at the level of your DOM you desire. i.e.:
@@ -31,7 +31,7 @@ a:focus-visible, select:focus-visible, *[tabindex]:focus-visible {
 }
 
 /* Alternatively you can import directly from unpkg */
-@import url("https://unpkg.com/d-pad@1.0.6/styles.css");
+@import url("https://unpkg.com/d-pad@1.0.7/styles.css");
 ```
 
 ## Navigation
